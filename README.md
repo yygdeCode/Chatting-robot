@@ -6,4 +6,4 @@ Node搭建一个简单的服务器作为代理。Node服务器接收页面发来
 # 注意事项
 图灵机器人服务器一段时间不用会断开服务。http://www.turingapi.com 注册一个账号，然后创建一个免费的服务。替换apikey即可。
 
-apikey位置：/web/TuLingApi.js  23行
+apikey位置：/web/TuLingApi.js       23行
