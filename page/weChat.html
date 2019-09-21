@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Robot</title>
+    <link rel="stylesheet" href="robot.css">
+    <script>
+        let name = null,
+        ws = null
+        function appendChat(text, type) {
+            console.log(text)
+            var chat = document.createElement("div");
+            var content = document.createElement("span");
+            var img = document.createElement("img");
+            content.innerHTML = text[1];
+           
+            if (type == 1) {
+                img.src = "./panda.jpeg";
+                img.style.float = "right";
+                img.style.width = "35px";
+                img.style.height = "35px";
+                img.style.marginRight = "5px";
+                content.classList.add("myChat");
+            } else {
+                var userName = document.createElement("b");
+        userName.innerHTML = text[0]
+        chat.appendChild(userName)
+        userName.classList.add("chatName");
+
+                img.src = "./robot.jpeg";
+                img.style.float = "left";
+                img.style.width = "40px";
+                img.style.height = "40px";
+                img.style.marginLeft = "5px";
+                content.classList.add("robotChat");
+            }
+
+            chat.appendChild(img);
+            chat.style.overflow = "hidden";
+            chat.style.marginTop = "15px";
+            chat.style.position ='relative'
+            chat.appendChild(content);
+            document.getElementsByClassName("content")[0].appendChild(chat);
+        }
+
+        function send(event) {
+            if (event instanceof KeyboardEvent && event.key != "Enter") {
+                return;
+            }
+            var val = document.getElementById("chatArea").value;
+            if (val == null || val == "") {
+                return;
+            }
+            
+            appendChat([name,val], 1);
+            ws.send(name + ',' + val)
+        }
+
+        function addName() {
+            let head = document.getElementsByClassName('head')[0],
+                chatName = document.getElementById('chatName');
+            name = chatName.value;
+            head.innerHTML = '<span>在线聊天室</span> <span>' + name + '</span>'
+             ws = new WebSocket("ws://localhost:1230/");
+            // 建立连接触发
+            ws.onopen = function () {
+                console.log("open ws");
+                ws.send(name+','+name + "进入聊天");
+            };
+            // 接收服务端数据触发
+            ws.onmessage = function (evt) {
+                var data = evt.data.split(',');
+                console.log(data)
+                if(data[0] !=name){
+                    appendChat(data, 2);
+                }
+            };
+            // 断开连接触发
+            ws.onclose = function () {
+                console.log("close ws");
+            };
+        }
+    </script>
+</head>
+
+<body>
+    <div id="chat">
+        <div class="head">
+            <span>在线聊天室</span>
+            <input type="text" id="chatName" placeholder="请输入姓名">
+            <button id="sendNameBtn" onclick="addName()">确定</button>
+        </div>
+        <div class="content"></div>
+        <div class="input">
+            <input type="text" id="chatArea" onkeydown="send(event)" />
+            <div id="sendBtn" onclick="send(event)">发送</div>
+        </div>
+    </div>
+</body>
+
+</html>
